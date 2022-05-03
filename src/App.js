@@ -1,23 +1,36 @@
-import logo from './logo.svg';
 import './App.css';
-
+import Video from "./components/video/Video";
+import {useEffect, useState} from "react";
+import { collection, getDocs,deleteDoc, doc, onSnapshot  } from "firebase/firestore";
+import {db} from "./firebase";
 function App() {
+    const [videos,setVideos]=useState([])
+    useEffect(()=>{
+        const fetchData=async()=>{
+          let list=[]
+         try{
+          const querySnapshot = await getDocs(collection(db, "videos"));
+          querySnapshot.forEach((doc) => {
+            list.push({id:doc.id,...doc.data()})
+          });
+          setVideos(list)
+          // console.log(list);
+         }
+         catch(err){
+           console.log(err);
+         }
+        }
+        fetchData()
+    },[])
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+        <div className={'app-videos'}>
+            {
+                videos.map((video,i)=>{
+                    return <Video {...video}/>
+                })
+            }
+        </div>
     </div>
   );
 }
